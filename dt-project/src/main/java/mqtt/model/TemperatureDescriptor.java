@@ -15,6 +15,26 @@ public class TemperatureDescriptor {
         this.provider = provider;
     }
 
+    public static String getFileTemperatureProvider() {
+        return FILE_TEMPERATURE_PROVIDER;
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("TemperatureDescriptor{");
