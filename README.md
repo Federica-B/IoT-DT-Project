@@ -3,11 +3,9 @@
 ## L’obbiettivo
 
 L’obbiettivo del progetto è la creazione di uno “dummy” smart object IoT che esegue l'inoltro di dati grezzi ad una controparte logica (digital twin) che provvederà alla formattazione dei dati in formati standard e alla loro esposizione verso il mondo esterno tramite protocolli di trasmissione standard.
-
 <p align="center">
-  <img class="center" src="imag/dt-scheme.png" width="80%">
+  <img class="center" src="img/dt-scheme.png" width="50%">
 </p>
-
 ## Dati
 I dati utilizzati provengono dal data set [“Condition monitoring of hydraulic systms Data Set”](https://archive.ics.uci.edu/ml/datasets/Condition+monitoring+of+hydraulic+systems#).
 
