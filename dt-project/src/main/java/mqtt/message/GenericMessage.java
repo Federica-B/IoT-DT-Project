@@ -3,6 +3,7 @@ package mqtt.message;
 import java.util.Map;
 
 public abstract class GenericMessage {
+
     private String type;
 
     private long timestamp;

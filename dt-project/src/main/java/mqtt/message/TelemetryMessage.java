@@ -9,22 +9,28 @@ public class TelemetryMessage<T>{
     @JsonProperty("type")
     private String type;
 
+    @JsonProperty("provider")
+    private String file_provider;
+
     @JsonProperty("data")
     private T dataValue;
+
 
     public TelemetryMessage() {
     }
 
-    public TelemetryMessage(String type, T dataValue) {
+    public TelemetryMessage(String type, T dataValue, String file_provider) {
         this.timestamp = System.currentTimeMillis();
         this.type = type;
         this.dataValue = dataValue;
+        this.file_provider = file_provider;
     }
 
-    public TelemetryMessage(long timestamp, String type, T dataValue) {
+    public TelemetryMessage(long timestamp, String type, T dataValue, String file_provider) {
         this.timestamp = timestamp;
         this.type = type;
         this.dataValue = dataValue;
+        this.file_provider = file_provider;
     }
 
     public long getTimestamp() {
@@ -51,12 +57,17 @@ public class TelemetryMessage<T>{
         this.dataValue = dataValue;
     }
 
+    public String getFile_provider() { return file_provider; }
+
+    public void setFile_provider(String file_provider) { this.file_provider = file_provider; }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("TelemetryMessage{");
         sb.append("timestamp = ").append(timestamp);
         sb.append(", type = ").append(type);
         sb.append(", dataValue = ").append(dataValue);
+        sb.append(", file_provider = ").append(file_provider);
         sb.append('}');
         return sb.toString();
     }

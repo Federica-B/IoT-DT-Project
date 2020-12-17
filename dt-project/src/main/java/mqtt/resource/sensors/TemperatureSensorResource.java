@@ -22,8 +22,9 @@ public class TemperatureSensorResource extends DTObjectResource<TemperatureDescr
 
     public static final String RESOURCE_TYPE = "iot::sensors:temperature";
 
-    //C:\Users\User\Desktop\Uni\Terzo anno\IoT\dt-project\data\TS1.txt
-    public static final String TEMPERATURE_FILE_NAME = "data/TS1.txt";
+    //C:\Users\User\Desktop\Uni\Terzo anno\IoT\Git-DT-project\IoT-DT-Project\dt-project\data
+    //TODO Insert a for to have all the documents and assigned.
+    public static final String TEMPERATURE_FILE_NAME = "C:\\Users\\User\\Desktop\\Uni\\Terzo anno\\IoT\\Git-DT-project\\IoT-DT-Project\\dt-project\\data\\TS1.txt";
 
     private List<Double> dataList = new ArrayList<Double>();
 
@@ -78,7 +79,7 @@ public class TemperatureSensorResource extends DTObjectResource<TemperatureDescr
                     if(dataListIterator.hasNext()) {
                         Double currentTemperature = dataListIterator.next();
                         updateTemperatureDescriptor = new TemperatureDescriptor(
-                                currentTemperature, TemperatureDescriptor.FILE_TEMPERATURE_PROVIDER);
+                                currentTemperature);
                     notifyUpdate(updateTemperatureDescriptor);
                     }else{
                         logger.info("End of the document");

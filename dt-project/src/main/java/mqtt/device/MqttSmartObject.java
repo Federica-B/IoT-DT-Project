@@ -79,9 +79,11 @@ public class MqttSmartObject {
                         @Override
                         public void onDataChanged(DTObjectResource<TemperatureDescriptor> resource, TemperatureDescriptor updatedValue) {
                             try{
+                                //I pass the value of the provider because i now befor hand what resurce is.
+                                //The problem with come up if i use multiple file, I GENERALIZE TO BE A ONLY BIG FILE
                                 publishTelemetryData(
                                         String.format("%s/%s/%s/%s", BASIC_TOPIC, smartObjectId, TELEMETRY_TOPIC,resourceEntry.getKey()),
-                                        new TelemetryMessage<>(dtObjectResource.getType(), updatedValue));
+                                        new TelemetryMessage<>(dtObjectResource.getType(), updatedValue.getValue(), TemperatureDescriptor.FILE_TEMPERATURE_PROVIDER));
 
                             }catch (MqttException | JsonProcessingException e){
                                 e.printStackTrace();
