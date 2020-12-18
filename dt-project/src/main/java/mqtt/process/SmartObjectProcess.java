@@ -22,10 +22,16 @@ public class SmartObjectProcess {
 
     private static int MQTT_BROKER_PORT = 1883;
 
-    public static void main(String[] args) {
+    private String smartObjectId;
+
+
+    public SmartObjectProcess(String smartObjectId) {
+        this.smartObjectId = smartObjectId;
+    }
+
+    public void run(TemperatureSensorResource temperatureSensorResource) {
 
         try{
-        String smartObjectId = UUID.randomUUID().toString();
 
         MqttClientPersistence persistence = new MemoryPersistence();
         IMqttClient mqttClient = new MqttClient(String.format("tcp://%s:%d",
@@ -45,7 +51,7 @@ public class SmartObjectProcess {
         MqttSmartObject mqttSmartObject = new MqttSmartObject();
         mqttSmartObject.init(smartObjectId, mqttClient, new HashMap<>(){
             {
-                put("temperature", new TemperatureSensorResource());
+                put("temperature", temperatureSensorResource);
             }
         });
         mqttSmartObject.start();

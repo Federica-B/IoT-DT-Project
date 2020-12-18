@@ -2,6 +2,7 @@ package mqtt.model;
 
 public class TemperatureDescriptor {
 
+    //Not really sure if is better this variable is here
     public static final String FILE_TEMPERATURE_PROVIDER = "temperature_provider_file";
 
     private double value;

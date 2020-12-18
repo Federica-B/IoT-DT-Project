@@ -9,3 +9,4 @@ dt-project/target/
 .gradle
 dt-project/*.iml
 dt-project/data/
+*/Ideas.txt

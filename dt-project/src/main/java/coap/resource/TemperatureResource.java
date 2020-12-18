@@ -5,6 +5,10 @@ import coap.utils.SenMLPack;
 import coap.utils.SenMLRecord;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import mqtt.model.TemperatureDescriptor;
+import mqtt.resource.DTObjectResource;
+import mqtt.resource.ResourceDataListener;
+import mqtt.resource.sensors.TemperatureSensorResource;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
@@ -39,18 +43,15 @@ public class TemperatureResource extends CoapResource {
 
     private ObjectMapper objectMapper;
 
-    private List<Double> temperatureList = new ArrayList<Double>();
+    /*private List<Double> temperatureList = new ArrayList<Double>();
 
     private ListIterator<Double> temperatureListIterator;
 
-    //TODO add the others file in the iteration
-    private static final String TEMPERATURE_FILE_NAME = "data/TS1.txt";
+    private static final String TEMPERATURE_FILE_NAME = "data/TS1.txt";*/
 
 
-    public TemperatureResource(String deviceId, String name) {
+    public TemperatureResource(String deviceId, String name, TemperatureSensorResource temperatureSensorResource) {
         super(name);
-
-        init();
 
         this.deviceId = deviceId;
 
@@ -71,44 +72,23 @@ public class TemperatureResource extends CoapResource {
         getAttributes().addAttribute("rt", RESOURCE_TYPE);
         getAttributes().addAttribute("if", CoreInterfaces.CORE_S.getValue());
 
-        //periodic update
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if(temperatureListIterator.hasNext()) {
-                    temperature = temperatureListIterator.next();
-                    //notification that the value has changed
-                   changed();
-                }else{
-                    logger.info("End of the document");
-                }
-            }
-        }, 0, SENSOR_UPDATE_TIME_MS);
-
-
+        addDataListener(temperatureSensorResource);
     }
 
-
-
-    private void init() {
-        try{
-
-            BufferedReader cvsReader = new BufferedReader(new FileReader(TEMPERATURE_FILE_NAME));
-            String row;
-            while ((row = cvsReader.readLine()) != null){
-                String [] line = row.split("\t");
-                for (String s : line) {
-                    temperatureList.add(Double.parseDouble(s));
+    private void addDataListener(TemperatureSensorResource temperatureSensorResource) {
+        temperatureSensorResource.addDataListener(new ResourceDataListener<TemperatureDescriptor>() {
+            @Override
+            //I don't know if this can be a thing, because there is the temperatureDescpritor that I use in MQTT
+            public void onDataChanged(DTObjectResource<TemperatureDescriptor> resource, TemperatureDescriptor updatedValue) {
+                try{
+                    temperature = updatedValue.getValue();
+                    //It ntified the observable
+                    changed();
+                }catch(Exception e){
+                    e.printStackTrace();
                 }
             }
-            logger.info("Temperature File correctly loaded! Size: {}", this.temperatureList.size());
-
-            this.temperatureListIterator = this.temperatureList.listIterator();
-
-        }catch(Exception e){
-            logger.error("Error init Resource Object! Msg: {}", e.getLocalizedMessage());
-        }
+        });
     }
 
     private Optional<String> getJsonSenmlResponse(){
