@@ -4,7 +4,9 @@ import coap.utils.CoreInterfaces;
 import coap.utils.SenMLPack;
 import coap.utils.SenMLRecord;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import mqtt.message.TelemetryMessage;
 import mqtt.model.TemperatureDescriptor;
 import mqtt.resource.DTObjectResource;
 import mqtt.resource.ResourceDataListener;
@@ -91,7 +93,7 @@ public class TemperatureResource extends CoapResource {
         });
     }
 
-    private Optional<String> getJsonSenmlResponse(){
+    /*private Optional<String> getJsonSenmlResponse(){
         try{
             SenMLPack senMLPack = new SenMLPack();
             SenMLRecord senMLRecord = new SenMLRecord();
@@ -110,7 +112,10 @@ public class TemperatureResource extends CoapResource {
             logger.error("Error Generiting SenML Record : {}", e.getLocalizedMessage());
             return Optional.empty();
         }
-    }
+    }*/
+
+
+    //Dont have to use JSON SenML but just a proprietary fromat
 
     @Override
     public void handleGET(CoapExchange exchange) {
@@ -118,21 +123,41 @@ public class TemperatureResource extends CoapResource {
 
         //two type of response: JSON + SenML and plain
         //code senml-json  110 - json 50 - plain 0
-        if(exchange.getRequestOptions().getAccept() == MediaTypeRegistry.APPLICATION_SENML_JSON ||
-                exchange.getRequestOptions().getAccept() == MediaTypeRegistry.APPLICATION_JSON){
-            Optional<String> senmlPayload = getJsonSenmlResponse();
+        if(exchange.getRequestOptions().getAccept() == MediaTypeRegistry.APPLICATION_JSON){
+            try {
+                TelemetryMessage<?> telemetryMessage = new TelemetryMessage(
+                        RESOURCE_TYPE, temperature, TemperatureDescriptor.FILE_TEMPERATURE_PROVIDER);
+                if (telemetryMessage != null) {
 
-            if(senmlPayload.isPresent())
-                exchange.respond(CoAP.ResponseCode.CONTENT, senmlPayload.get(), exchange.getRequestOptions().getAccept());
-            else
-                exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR);
+                    Optional<String> jsonResponse = Optional.ofNullable(objectMapper.writeValueAsString(telemetryMessage));
+
+                    if (jsonResponse.isPresent())
+                        exchange.respond(CoAP.ResponseCode.CONTENT, jsonResponse.get(), exchange.getRequestOptions().getAccept());
+                }
+                else{ exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR);}
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
         }else{
-            if(temperature != null)
-                exchange.respond(CoAP.ResponseCode.CONTENT, String.valueOf(temperature),MediaTypeRegistry.TEXT_PLAIN);
+
+            Optional<String> textPlainResponse = getTextPlainResponse();
+
+            if(textPlainResponse.isPresent())
+                exchange.respond(CoAP.ResponseCode.CONTENT, textPlainResponse.get(), exchange.getRequestOptions().getAccept());
             else
                 exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR);
 
-        }
+            }
+
+    }
+
+
+    private Optional<String> getTextPlainResponse() {
+        final StringBuffer sb = new StringBuffer("{");
+        sb.append(System.currentTimeMillis()).append(", ");
+        sb.append(temperature.toString()).append("}");
+        return Optional.of(sb.toString());
     }
 
 }
