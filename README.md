@@ -5,7 +5,7 @@
 L’obbiettivo del progetto è la creazione di uno “dummy” smart object IoT che esegue l'inoltro di dati grezzi ad una controparte logica (digital twin) che provvederà alla formattazione dei dati in formati standard e alla loro esposizione verso il mondo esterno tramite protocolli di trasmissione standard.
 
 <p align="center">
-  <img class="center" src="img/dt-scheme.png" width="50%">
+  <img class="center" src="img/dt-scheme-1.0.png" width="50%">
 </p>
 
 ## Dati
