@@ -1,13 +1,14 @@
-import coap.resource.TemperatureResource;
+package sharedProtocolsClass;
+
 import coap.sever.CoapServerProcess;
 import mqtt.process.SmartObjectProcess;
-import mqtt.resource.sensors.TemperatureSensorResource;
+import sharedProtocolsClass.resource.sensors.TemperatureSensorResource;
 
 import java.util.UUID;
 
 public class SmartObjectCommunicationProcess {
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 
         String smartObjectId = UUID.randomUUID().toString();
         TemperatureSensorResource temperatureSensorResource = new TemperatureSensorResource();
@@ -15,8 +16,8 @@ public class SmartObjectCommunicationProcess {
         CoapServerProcess coapServerProcess = new CoapServerProcess(smartObjectId, temperatureSensorResource);
         coapServerProcess.start();
 
-        SmartObjectProcess smartObjectProcess = new SmartObjectProcess(smartObjectId);
+        SmartObjectProcess smartObjectProcess = new SmartObjectProcess();
         smartObjectProcess.run(temperatureSensorResource);
 
-    }
+    }*/
 }

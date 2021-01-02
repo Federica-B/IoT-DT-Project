@@ -1,4 +1,4 @@
-package mqtt.Consumer.message;
+package mqtt.consumer.message;
 
 public class MessageDescriptor {
 

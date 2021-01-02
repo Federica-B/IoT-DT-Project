@@ -2,11 +2,12 @@ package mqtt.device;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import mqtt.configurationMqtt.MqttSmartObjectConfiguration;
 import mqtt.message.TelemetryMessage;
 import mqtt.model.TemperatureDescriptor;
-import mqtt.resource.DTObjectResource;
-import mqtt.resource.ResourceDataListener;
-import mqtt.resource.sensors.TemperatureSensorResource;
+import sharedProtocolsClass.resource.DTObjectResource;
+import sharedProtocolsClass.resource.ResourceDataListener;
+import sharedProtocolsClass.resource.sensors.TemperatureSensorResource;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -19,14 +20,7 @@ public class MqttSmartObject {
 
     private static final Logger logger = LoggerFactory.getLogger(MqttSmartObject.class);
 
-    //TODO replace this values with a file yaml
-    private static final String BASIC_TOPIC = "iot/DT";
-
-    private static final String TELEMETRY_TOPIC = "telemetry";
-
     //TODO eventually add command, event and control
-
-    private String smartObjectId;
 
     private ObjectMapper mapper;
 
@@ -34,12 +28,14 @@ public class MqttSmartObject {
 
     private Map<String, DTObjectResource<?>> resourceMap;
 
+    private static MqttSmartObjectConfiguration mqttSmartObjectConfiguration;
+
     public MqttSmartObject() {
         this.mapper = new ObjectMapper();
     }
 
-    public void init(String smartObjectId, IMqttClient mqttClient, Map<String, DTObjectResource<?>> resourceMap){
-        this.smartObjectId = smartObjectId;
+    public void init(MqttSmartObjectConfiguration mqttSmartObjectConfiguration, IMqttClient mqttClient, Map<String, DTObjectResource<?>> resourceMap){
+        this.mqttSmartObjectConfiguration = mqttSmartObjectConfiguration;
         this.mqttClient = mqttClient;
         this.resourceMap = resourceMap;
 
@@ -51,8 +47,8 @@ public class MqttSmartObject {
     public void start(){
         try {
             if(this.mqttClient != null &&
-            this.smartObjectId != null &&
-            this.smartObjectId.length() > 0 &&
+            this.mqttSmartObjectConfiguration.getDeviceID() != null &&
+            this.mqttSmartObjectConfiguration.getDeviceID().length() > 0 &&
             this.resourceMap != null &&
             this.resourceMap.keySet().size() > 0){
                 logger.info("Starting Smart Object Emulator ...");
@@ -79,10 +75,12 @@ public class MqttSmartObject {
                         @Override
                         public void onDataChanged(DTObjectResource<TemperatureDescriptor> resource, TemperatureDescriptor updatedValue) {
                             try{
-                                //I pass the value of the provider because i now befor hand what resurce is.
-                                //The problem with come up if i use multiple file, I GENERALIZE TO BE A ONLY BIG FILE
+                                //I pass the value of the provider because i now before hand what resurce is.
                                 publishTelemetryData(
-                                        String.format("%s/%s/%s/%s", BASIC_TOPIC, smartObjectId, TELEMETRY_TOPIC,resourceEntry.getKey()),
+                                        String.format("%s/%s/%s/%s", mqttSmartObjectConfiguration.getBasicTopic(),
+                                                mqttSmartObjectConfiguration.getDeviceID(),
+                                                mqttSmartObjectConfiguration.getTelemetryTopic(),
+                                                resourceEntry.getKey()),
                                         new TelemetryMessage<>(dtObjectResource.getType(), updatedValue.getValue(), TemperatureDescriptor.FILE_TEMPERATURE_PROVIDER));
 
                             }catch (MqttException | JsonProcessingException e){
@@ -108,7 +106,7 @@ public class MqttSmartObject {
             String messagePayload = mapper.writeValueAsString(telemetryMessage);
 
             MqttMessage mqttMessage = new MqttMessage(messagePayload.getBytes());
-            mqttMessage.setQos(0);
+            mqttMessage.setQos(mqttSmartObjectConfiguration.getMqttOutgoingClientQoS());
             mqttClient.publish(topic, mqttMessage);
             logger.info("Data Correctly Publish to topic: {}", topic);
 

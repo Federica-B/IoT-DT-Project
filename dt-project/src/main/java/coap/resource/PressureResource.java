@@ -1,23 +1,30 @@
 package coap.resource;
 
+import coap.sever.configurationCoap.CoapSmartObjectConfiguration;
 import coap.utils.CoreInterfaces;
 import coap.utils.SenMLPack;
 import coap.utils.SenMLRecord;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import mqtt.model.PressureDescpritor;
+import mqtt.model.TemperatureDescriptor;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sharedProtocolsClass.resource.DTObjectResource;
+import sharedProtocolsClass.resource.ResourceDataListener;
+import sharedProtocolsClass.resource.sensors.PressureSensorResource;
+import sharedProtocolsClass.resource.sensors.TemperatureSensorResource;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.*;
 
 
-//TODO better if the configurations value are read from a configuration file!
+
 public class PressureResource extends CoapResource {
 
     private final static Logger logger = LoggerFactory.getLogger(TemperatureResource.class);
@@ -29,15 +36,9 @@ public class PressureResource extends CoapResource {
     //TODO write better RESOURCE_TYPE
     private static final String RESOURCE_TYPE = "dt.sensor.pressure";
 
-    //TODO better configurationd of this values
-    private static final long SENSOR_UPDATE_TIME_MS = 1000; //1Hz for update
-
-    private static final int RESOURCE_MAX_AGE_SECONDS = 1;
 
     // TODO converting bar values in Pa because SenML does not support bar but Pa.
     private Number pressure;
-
-    private String deviceId;
 
     // TODO converting bar values in Pa because SenML does not support bar but Pa.
     private static final String PRESSURE_UNIT = "Pa";
@@ -46,21 +47,14 @@ public class PressureResource extends CoapResource {
 
     private ObjectMapper objectMapper;
 
-    private List<Double> pressureList = new ArrayList<Double>();
-
-    private ListIterator<Double> pressureListIterator;
-
-    private static final String DIRECTORY_DATA = "data";
-
-    private static final String[] TEMPERATURE_FILES_NAME = {"PS1.txt", "PS2.txt"};
+    private CoapSmartObjectConfiguration coapSmartObjectConfiguration;
 
 
-    public PressureResource(String deviceId, String name) {
+
+    public PressureResource(CoapSmartObjectConfiguration coapSmartObjectConfiguration, String name, PressureSensorResource pressureSensorResource) {
         super(name);
 
-        init();
-
-        this.deviceId = deviceId;
+        this.coapSmartObjectConfiguration = coapSmartObjectConfiguration;
 
         this.objectMapper = new ObjectMapper();
         this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -77,53 +71,30 @@ public class PressureResource extends CoapResource {
         getAttributes().addAttribute("rt", RESOURCE_TYPE);
         getAttributes().addAttribute("if", CoreInterfaces.CORE_S.getValue());
 
-        //periodic update
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
+        seyUpDataListener(pressureSensorResource);
+    }
+
+    private void seyUpDataListener(PressureSensorResource pressureSensorResource) {
+        pressureSensorResource.addDataListener(new ResourceDataListener<PressureDescpritor>() {
             @Override
-            public void run() {
-                if(pressureListIterator.hasNext()) {
-                    pressure = pressureListIterator.next();
-                    //notification that the value has changed
+            //I don't know if this can be a thing, because there is the temperatureDescpritor that I use in MQTT
+            public void onDataChanged(DTObjectResource<PressureDescpritor> resource, PressureDescpritor updatedValue) {
+                try{
+                    pressure = updatedValue.getValue();
+                    //It notified the observable
                     changed();
-                }else{
-                    logger.info("End of the document");
+                }catch(Exception e){
+                    e.printStackTrace();
                 }
             }
-        }, 0, SENSOR_UPDATE_TIME_MS);
-
+        });
     }
-
-    private void init() {
-        try{
-
-            for(String s : TEMPERATURE_FILES_NAME){
-                BufferedReader cvsReader = new BufferedReader(new FileReader(DIRECTORY_DATA+ "/"+ s));
-                String row;
-                while ((row = cvsReader.readLine()) != null){
-                    String [] line = row.split("\t");
-                    for (String st : line) {
-                        double convertedValue = Double.parseDouble(st) * BAR_TO_PASCAL;
-                        pressureList.add(convertedValue);
-                    }
-                }
-                logger.info("Temperature File correctly loaded! Size: {}", this.pressureList.size());
-
-                this.pressureListIterator = this.pressureList.listIterator();
-            }
-
-        }catch(Exception e){
-            logger.error("Error init Resource Object! Msg: {}", e.getLocalizedMessage());
-        }
-
-    }
-
     private Optional<String> getJsonSenmlResponse(){
         try{
             SenMLPack senMLPack = new SenMLPack();
             SenMLRecord senMLRecord = new SenMLRecord();
 
-            senMLRecord.setBaseName(String.format("%s:%s", this.deviceId, this.getName()));
+            senMLRecord.setBaseName(String.format("%s:%s", this.coapSmartObjectConfiguration.getDeviceID(), this.getName()));
             senMLRecord.setVersion(SENSOR_VERSION);
             senMLRecord.setUnit(PRESSURE_UNIT);
             senMLRecord.setValue(pressure);
@@ -141,7 +112,7 @@ public class PressureResource extends CoapResource {
 
     @Override
     public void handleGET(CoapExchange exchange) {
-        exchange.setMaxAge(RESOURCE_MAX_AGE_SECONDS);
+        exchange.setMaxAge(coapSmartObjectConfiguration.getResourceMaxAgeSecond());
 
         //two type of response: JSON + SenML and plain
         //code senml-json  110 - json 50 - plain 0

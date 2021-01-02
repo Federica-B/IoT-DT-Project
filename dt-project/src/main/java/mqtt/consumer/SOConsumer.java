@@ -1,6 +1,6 @@
-package mqtt.Consumer;
+package mqtt.consumer;
 
-import mqtt.Consumer.message.MessageDescriptor;
+import mqtt.consumer.message.MessageDescriptor;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;

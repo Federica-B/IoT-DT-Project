@@ -1,10 +1,12 @@
-package mqtt.resource.sensors;
+package sharedProtocolsClass.resource.sensors;
 
+import mqtt.configurationMqtt.MqttSmartObjectConfiguration;
 import mqtt.model.TemperatureDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import mqtt.resource.DTObjectResource;
-import mqtt.resource.ResourceDataListener;
+import sharedProtocolsClass.ProtocolConfiguration;
+import sharedProtocolsClass.resource.DTObjectResource;
+import sharedProtocolsClass.resource.ResourceDataListener;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -13,12 +15,6 @@ import java.util.*;
 public class TemperatureSensorResource extends DTObjectResource<TemperatureDescriptor> {
 
     private static final Logger logger = LoggerFactory.getLogger(TemperatureSensorResource.class);
-
-    //5 seconds of update
-    private static final long UPDATE_PERIOD = 5000;
-
-    //optional --> seconds before starting the periodic update task.
-    private static final long TASK_DELAY_TIME = 5000;
 
     public static final String RESOURCE_TYPE = "iot::sensors:temperature";
 
@@ -34,13 +30,17 @@ public class TemperatureSensorResource extends DTObjectResource<TemperatureDescr
 
     private TemperatureDescriptor updateTemperatureDescriptor = null;
 
-    public TemperatureSensorResource() {
+    private ProtocolConfiguration protocolConfiguration;
+
+    public TemperatureSensorResource(ProtocolConfiguration protocolConfiguration) {
         super(UUID.randomUUID().toString(), TemperatureSensorResource.RESOURCE_TYPE);
+        this.protocolConfiguration = protocolConfiguration;
         init();
     }
 
-    public TemperatureSensorResource(String id, String type) {
+    public TemperatureSensorResource(String id, String type, ProtocolConfiguration protocolConfiguration) {
         super(id, type);
+        this.protocolConfiguration = protocolConfiguration;
         init();
     }
 
@@ -69,7 +69,7 @@ public class TemperatureSensorResource extends DTObjectResource<TemperatureDescr
 
     private void startPeriodicEventValueUpdateTask() {
         try{
-            logger.info("Starting periodic Update Task with Period {} ms", UPDATE_PERIOD);
+            logger.info("Starting periodic Update Task with Period {} ms", protocolConfiguration.getTelemetryUpdateTimeMs());
 
             this.updateTimer = new Timer();
             this.updateTimer.schedule(new TimerTask() {
@@ -85,7 +85,7 @@ public class TemperatureSensorResource extends DTObjectResource<TemperatureDescr
                         logger.info("End of the document");
                     }
                 }
-                }, TASK_DELAY_TIME, UPDATE_PERIOD);
+                }, protocolConfiguration.getStartUpDelayMs(), protocolConfiguration.getTelemetryUpdateTimeMs());
         }catch (Exception e){
             logger.error("Error executing periodic resource value {}", e.getLocalizedMessage());
         }
@@ -96,7 +96,7 @@ public class TemperatureSensorResource extends DTObjectResource<TemperatureDescr
         return this.updateTemperatureDescriptor;
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         TemperatureSensorResource temperatureSensorResource = new TemperatureSensorResource();
         temperatureSensorResource.addDataListener(new ResourceDataListener<TemperatureDescriptor>() {
             @Override
@@ -108,5 +108,5 @@ public class TemperatureSensorResource extends DTObjectResource<TemperatureDescr
 
             }
         });
-    }
+    }*/
 }
