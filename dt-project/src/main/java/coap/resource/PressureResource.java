@@ -33,6 +33,8 @@ public class PressureResource extends CoapResource {
 
     private static final String OBJECT_TITLE = "PressureSensor";
 
+    public final String RESOURCE_LINK_NAME = "pressure";
+
     //TODO write better RESOURCE_TYPE
     private static final String RESOURCE_TYPE = "dt.sensor.pressure";
 

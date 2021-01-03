@@ -1,8 +1,12 @@
 # Mqtt Smart Object Configuration
 
-mqttBrokerAddress: 127.0.0.1
+mqttBrokerAddress: 10.0.0.174
 
 mqttBrokerPort: 1883
+
+mqttUser: pw
+
+mqttPw: user
 
 deviceNameSpace: com.iot.smartobject
 

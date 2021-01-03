@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import mqtt.configurationMqtt.MqttSmartObjectConfiguration;
 import mqtt.device.MqttSmartObject;
+import sharedProtocolsClass.resource.DTObjectResource;
 import sharedProtocolsClass.resource.sensors.PressureSensorResource;
 import sharedProtocolsClass.resource.sensors.TemperatureSensorResource;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
@@ -16,11 +17,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
-public class SmartObjectProcess {
+public class MqttSmartObjectProcess {
 
-    private static final Logger logger = LoggerFactory.getLogger(SmartObjectProcess.class);
+    private static final Logger logger = LoggerFactory.getLogger(MqttSmartObjectProcess.class);
 
     private static final String TAG = "[MQTT-SMARTOBJECT]";
 
@@ -29,14 +31,29 @@ public class SmartObjectProcess {
     private static MqttSmartObjectConfiguration mqttSmartObjectConfiguration;
 
 
-    public SmartObjectProcess(){
-        run();
+    public MqttSmartObjectProcess()  {
+
+        readConfigurationFile();
+
+        run(new HashMap<>(){
+            {
+                put("temperature", new TemperatureSensorResource(mqttSmartObjectConfiguration));
+                put("pressure", new PressureSensorResource(mqttSmartObjectConfiguration));
+
+            }
+        });
     }
-    public void run() {
+
+    public MqttSmartObjectProcess(Map<String, DTObjectResource<?>> resourceMap){
+        readConfigurationFile();
+        run(resourceMap);
+    }
+
+
+    public void run(Map<String, DTObjectResource<?>> resourceMap) {
 
         try{
 
-            readConfigurationFile();
             MqttClientPersistence persistence = new MemoryPersistence();
             IMqttClient mqttClient = new MqttClient(String.format("tcp://%s:%d",
                 mqttSmartObjectConfiguration.getMqttBrokerAddress(),
@@ -48,25 +65,21 @@ public class SmartObjectProcess {
         options.setAutomaticReconnect(mqttSmartObjectConfiguration.getAutomaticReconnect());
         options.setCleanSession(mqttSmartObjectConfiguration.getCleanSession());
         options.setConnectionTimeout(mqttSmartObjectConfiguration.getConnectionTimeout());
+        options.setUserName(mqttSmartObjectConfiguration.getMqttUser());
+        options.setPassword(mqttSmartObjectConfiguration.getMqttPw().toCharArray());
 
         mqttClient.connect(options);
         logger.info("MQTT Client Connected! Cliend ID: {}", mqttSmartObjectConfiguration.getDeviceID());
 
         MqttSmartObject mqttSmartObject = new MqttSmartObject();
-        mqttSmartObject.init(mqttSmartObjectConfiguration, mqttClient, new HashMap<>(){
-            {
-                //put("temperature", temperatureSensorResource);
-                put("temperature", new TemperatureSensorResource(mqttSmartObjectConfiguration));
-                put("pressure", new PressureSensorResource(mqttSmartObjectConfiguration));
-            }
-        });
+        mqttSmartObject.init(mqttSmartObjectConfiguration, mqttClient, resourceMap);
         mqttSmartObject.start();
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    private static void readConfigurationFile() throws Exception {
+    private static void readConfigurationFile(){
 
         try{
 
@@ -88,13 +101,12 @@ public class SmartObjectProcess {
             e.printStackTrace();
             String errorMessage = String.format("ERROR LOADING CONFIGURATION FILE ! Error: %s", e.getLocalizedMessage());
             logger.error("{} {}", TAG, errorMessage);
-            throw new Exception(errorMessage);
         }
     }
 
     public static void main(String[] args) {
 
-        SmartObjectProcess smartObjectProcess = new SmartObjectProcess();
+        MqttSmartObjectProcess mqttSmartObjectProcess = new MqttSmartObjectProcess();
     }
 
 }

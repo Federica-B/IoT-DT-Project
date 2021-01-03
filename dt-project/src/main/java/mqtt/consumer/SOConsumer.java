@@ -16,7 +16,7 @@ public class SOConsumer {
     private final static Logger logger = LoggerFactory.getLogger(SOConsumer.class);
 
     //IP Address of the target MQTT Broker
-    private static String BROKER_ADDRESS = "10.0.0.170";
+    private static String BROKER_ADDRESS = "10.0.0.174";
 
     //PORT of the target MQTT Broker
     private static int BROKER_PORT = 1883;
@@ -41,6 +41,8 @@ public class SOConsumer {
             options.setAutomaticReconnect(true);
             options.setCleanSession(true);
             options.setConnectionTimeout(10);
+            options.setUserName("pw");
+            options.setPassword("user".toCharArray());
 
             subscriber.connect(options);
 

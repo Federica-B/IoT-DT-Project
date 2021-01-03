@@ -1,13 +1,18 @@
 package sharedProtocolsClass.resource.sensors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import mqtt.configurationMqtt.MqttSmartObjectConfiguration;
 import mqtt.model.PressureDescpritor;
 import mqtt.model.TemperatureDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sharedProtocolsClass.ProtocolConfiguration;
 import sharedProtocolsClass.resource.DTObjectResource;
+import sharedProtocolsClass.resource.ResourceDataListener;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.util.*;
 
@@ -15,7 +20,7 @@ public class PressureSensorResource extends DTObjectResource<PressureDescpritor>
 
     private static final Logger logger = LoggerFactory.getLogger(PressureSensorResource.class);
 
-    public static final String RESOURCE_TYPE = "iot::sensors:pressure";
+    public static final String RESOURCE_TYPE = "iot:sensors:pressure";
 
     //C:\Users\User\Desktop\Uni\Terzo anno\IoT\Git-DT-project\IoT-DT-Project\dt-project\data
     //TODO Insert a for to have all the documents and assigned.
@@ -32,7 +37,7 @@ public class PressureSensorResource extends DTObjectResource<PressureDescpritor>
     private ProtocolConfiguration protocolConfiguration;
 
     public PressureSensorResource(ProtocolConfiguration protocolConfiguration) {
-        super(UUID.randomUUID().toString(), TemperatureSensorResource.RESOURCE_TYPE);
+        super(UUID.randomUUID().toString(), PressureSensorResource.RESOURCE_TYPE);
         this.protocolConfiguration = protocolConfiguration;
         init();
     }
@@ -55,7 +60,7 @@ public class PressureSensorResource extends DTObjectResource<PressureDescpritor>
                     dataList.add(Double.parseDouble(s));
                 }
             }
-            logger.info("Temperature File correctly loaded! Size: {}", this.dataList.size());
+            logger.info("Pressure File correctly loaded! Size: {}", this.dataList.size());
 
             this.dataListIterator = this.dataList.listIterator();
 
@@ -94,4 +99,50 @@ public class PressureSensorResource extends DTObjectResource<PressureDescpritor>
         return this.updatePressureDescriptor;
     }
 
+
+    /*private static final String MQTT_SMARTOBJECT_CONFIGURATION_FILE = "C:\\Users\\User\\Desktop\\Uni\\Terzo anno\\IoT\\Git-DT-project\\IoT-DT-Project\\dt-project\\smart_object_mqtt_conf.yaml";
+
+    private static  ProtocolConfiguration readConfigurationFile() {
+
+        try{
+
+            MqttSmartObjectConfiguration mqttSmartObjectConfiguration = new MqttSmartObjectConfiguration();
+
+            //ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            //File file = new File(classLoader.getResource(WLDT_CONFIGURATION_FILE).getFile());
+            File file = new File(MQTT_SMARTOBJECT_CONFIGURATION_FILE);
+
+            ObjectMapper om = new ObjectMapper(new YAMLFactory());
+
+            mqttSmartObjectConfiguration = om.readValue(file, MqttSmartObjectConfiguration.class);
+
+            if(mqttSmartObjectConfiguration.getDeviceID() == null){
+                mqttSmartObjectConfiguration.setDeviceID(UUID.randomUUID().toString());
+            }
+
+            logger.info("MQTT Configuration Loaded ! Conf: {}", mqttSmartObjectConfiguration);
+
+            return (ProtocolConfiguration) mqttSmartObjectConfiguration;
+
+        }catch (Exception e){
+            e.printStackTrace();
+            String errorMessage = String.format("ERROR LOADING CONFIGURATION FILE ! Error: %s", e.getLocalizedMessage());
+            logger.error("{} {}", errorMessage);
+            return null;
+        }
+    }
+
+     public static void main(String[] args) {
+        PressureSensorResource pressureSensorResource = new PressureSensorResource(readConfigurationFile());
+        pressureSensorResource.addDataListener(new ResourceDataListener<PressureDescpritor>() {
+            @Override
+            public void onDataChanged(DTObjectResource<PressureDescpritor> resource, PressureDescpritor updatedValue) {
+                if(resource != null && updatedValue != null)
+                    logger.info("Device: {} --> New Value Recived: {}", resource.getId(), updatedValue);
+                else
+                    logger.error("onDataChangedCallback --> Null Resource or Update Value");
+            }
+
+        });
+    }*/
 }

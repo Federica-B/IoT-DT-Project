@@ -16,7 +16,7 @@ public class TemperatureSensorResource extends DTObjectResource<TemperatureDescr
 
     private static final Logger logger = LoggerFactory.getLogger(TemperatureSensorResource.class);
 
-    public static final String RESOURCE_TYPE = "iot::sensors:temperature";
+    public static final String RESOURCE_TYPE = "iot:sensors:temperature";
 
     //C:\Users\User\Desktop\Uni\Terzo anno\IoT\Git-DT-project\IoT-DT-Project\dt-project\data
     //TODO Insert a for to have all the documents and assigned.

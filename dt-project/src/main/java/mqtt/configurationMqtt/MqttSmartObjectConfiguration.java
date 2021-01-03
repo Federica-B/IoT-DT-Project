@@ -12,6 +12,10 @@ public class MqttSmartObjectConfiguration extends ProtocolConfiguration {
 
     private int mqttBrokerPort;
 
+    private String mqttUser;
+
+    private String mqttPw;
+
     private String basicTopic;
 
     private String telemetryTopic;
@@ -44,6 +48,21 @@ public class MqttSmartObjectConfiguration extends ProtocolConfiguration {
         this.mqttBrokerPort = mqttBrokerPort;
     }
 
+    public String getMqttUser() {
+        return mqttUser;
+    }
+
+    public void setMqttUser(String mqttUser) {
+        this.mqttUser = mqttUser;
+    }
+
+    public String getMqttPw() {
+        return mqttPw;
+    }
+
+    public void setMqttPw(String mqttPw) {
+        this.mqttPw = mqttPw;
+    }
 
     public String getBasicTopic() {
         return basicTopic;
@@ -98,6 +117,8 @@ public class MqttSmartObjectConfiguration extends ProtocolConfiguration {
         final StringBuffer sb = new StringBuffer("MqttSmartObjectConfiguration{");
         sb.append("mqttBrokerAddress='").append(mqttBrokerAddress);
         sb.append(", mqttBrokerPort=").append(mqttBrokerPort);
+        sb.append(", mqttUser=").append(mqttUser);
+        sb.append(", mqttPw").append(mqttPw);
         sb.append(", deviceNameSpace='").append(super.getDeviceNameSpace());
         sb.append(", deviceID= ").append(super.getDeviceID());
         sb.append(", basicTopic= ").append(basicTopic);

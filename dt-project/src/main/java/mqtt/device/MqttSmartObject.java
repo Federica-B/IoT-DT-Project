@@ -4,9 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import mqtt.configurationMqtt.MqttSmartObjectConfiguration;
 import mqtt.message.TelemetryMessage;
+import mqtt.model.PressureDescpritor;
 import mqtt.model.TemperatureDescriptor;
 import sharedProtocolsClass.resource.DTObjectResource;
 import sharedProtocolsClass.resource.ResourceDataListener;
+import sharedProtocolsClass.resource.sensors.PressureSensorResource;
 import sharedProtocolsClass.resource.sensors.TemperatureSensorResource;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -89,7 +91,29 @@ public class MqttSmartObject {
                         }
                     });
                 }
+                if(dtObjectResource.getType().equals(PressureSensorResource.RESOURCE_TYPE)){
+                    PressureSensorResource pressureSensorResource = (PressureSensorResource) dtObjectResource;
+                    pressureSensorResource.addDataListener(new ResourceDataListener<PressureDescpritor>() {
+                        @Override
+                        public void onDataChanged(DTObjectResource<PressureDescpritor> resource, PressureDescpritor updatedValue) {
+                            try{
+                                //I pass the value of the provider because i now before hand what resurce is.
+                                publishTelemetryData(
+                                        String.format("%s/%s/%s/%s", mqttSmartObjectConfiguration.getBasicTopic(),
+                                                mqttSmartObjectConfiguration.getDeviceID(),
+                                                mqttSmartObjectConfiguration.getTelemetryTopic(),
+                                                resourceEntry.getKey()),
+                                        new TelemetryMessage<>(dtObjectResource.getType(), updatedValue.getValue(), PressureDescpritor.FILE_TEMPERATURE_PROVIDER));
+
+                            }catch (MqttException | JsonProcessingException e){
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
             }
+
+
         });
 
     }

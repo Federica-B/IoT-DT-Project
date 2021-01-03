@@ -28,6 +28,8 @@ public class TemperatureResource extends CoapResource {
 
     private final String RESOURCE_TYPE = "dt.sensor.temperature";
 
+    private final String RESOURCE_LINK_NAME = "temperature";
+
     private static final Number SENSOR_VERSION = 0.1;
 
     private static final String OBJECT_TITLE = "TemperatureSensor";
@@ -147,4 +149,7 @@ public class TemperatureResource extends CoapResource {
         return Optional.of(sb.toString());
     }
 
+    public String getRESOURCE_LINK_NAME() {
+        return RESOURCE_LINK_NAME;
+    }
 }

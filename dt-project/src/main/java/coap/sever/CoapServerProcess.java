@@ -3,9 +3,15 @@ package coap.sever;
 import coap.resource.PressureResource;
 import coap.resource.TemperatureResource;
 import coap.sever.configurationCoap.CoapSmartObjectConfiguration;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import mqtt.configurationMqtt.MqttSmartObjectConfiguration;
+import mqtt.message.TelemetryMessage;
+import mqtt.model.TemperatureDescriptor;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import sharedProtocolsClass.resource.DTObjectResource;
+import sharedProtocolsClass.resource.ResourceDataListener;
 import sharedProtocolsClass.resource.sensors.PressureSensorResource;
 import sharedProtocolsClass.resource.sensors.TemperatureSensorResource;
 import org.eclipse.californium.core.CoapServer;
@@ -13,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -25,8 +32,8 @@ public class CoapServerProcess extends CoapServer {
     private static final String TAG = "[COAP-SMARTOBJECT]";
 
     public CoapServerProcess() {
-        super();
 
+        super();
         readConfigurationFile();
 
         String deviceId = String.format("dt:%s",coapSmartObjectConfiguration.getDeviceID());
@@ -45,22 +52,32 @@ public class CoapServerProcess extends CoapServer {
 
     }
 
-    public CoapServerProcess(TemperatureSensorResource temperatureSensorResource, PressureSensorResource pressureSensorResource) {
+    public CoapServerProcess (Map<String, DTObjectResource<?>> resourceMap){
         super();
 
         readConfigurationFile();
 
         String deviceId = String.format("dt:%s",coapSmartObjectConfiguration.getDeviceID());
 
-        TemperatureResource temperatureResource = new TemperatureResource(coapSmartObjectConfiguration, "temperature",temperatureSensorResource);
-        PressureResource pressureResource = new PressureResource(coapSmartObjectConfiguration, "pressure",pressureSensorResource );
-        //PressureResource pressureResource = new PressureResource(deviceId, "pressure");
-
         logger.info("Defining and adding resources ...");
 
-        this.add(temperatureResource);
-        this.add(pressureResource);
+        resourceMap.entrySet().forEach(resourceEntry ->{
+
+            if(resourceEntry.getKey() != null && resourceEntry.getValue() != null){
+                DTObjectResource dtObjectResource = resourceEntry.getValue();
+                if(dtObjectResource.getType().equals(TemperatureSensorResource.RESOURCE_TYPE)){
+                    TemperatureResource temperatureResource = new TemperatureResource(coapSmartObjectConfiguration, "temperature",(TemperatureSensorResource) dtObjectResource);
+                    this.add(temperatureResource);
+                }
+                if(dtObjectResource.getType().equals(PressureSensorResource.RESOURCE_TYPE)){
+                    PressureResource pressureResource = new PressureResource(coapSmartObjectConfiguration, "pressure", (PressureSensorResource) dtObjectResource);
+                    this.add(pressureResource);
+                }
+        }
+    });
     }
+
+
 
     private static void readConfigurationFile(){
 
@@ -97,6 +114,7 @@ public class CoapServerProcess extends CoapServer {
         coapServerProcess.start();
 
         logger.info("Coap Server Started");
+
 
         coapServerProcess.getRoot().getChildren().stream().forEach(resource -> {
             logger.info("Resource {} URI: {} (Observable: {})", resource.getName(), resource.getURI(), resource.isObservable());

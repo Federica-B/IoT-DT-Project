@@ -3,6 +3,7 @@ package mqtt.model;
 public class PressureDescpritor {
 
     public static final String FILE_TEMPERATURE_PROVIDER = "pressure_provider_file";
+
     private double value;
 
     public PressureDescpritor() {
