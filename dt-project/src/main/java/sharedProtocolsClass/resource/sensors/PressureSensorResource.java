@@ -1,18 +1,12 @@
 package sharedProtocolsClass.resource.sensors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import mqtt.configurationMqtt.MqttSmartObjectConfiguration;
 import mqtt.model.PressureDescpritor;
-import mqtt.model.TemperatureDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sharedProtocolsClass.ProtocolConfiguration;
+import sharedProtocolsClass.ResourceConfiguration;
 import sharedProtocolsClass.resource.DTObjectResource;
-import sharedProtocolsClass.resource.ResourceDataListener;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.util.*;
 
@@ -34,17 +28,17 @@ public class PressureSensorResource extends DTObjectResource<PressureDescpritor>
 
     private PressureDescpritor updatePressureDescriptor = null;
 
-    private ProtocolConfiguration protocolConfiguration;
+    private ResourceConfiguration resourceConfiguration;
 
-    public PressureSensorResource(ProtocolConfiguration protocolConfiguration) {
+    public PressureSensorResource(ResourceConfiguration resourceConfiguration) {
         super(UUID.randomUUID().toString(), PressureSensorResource.RESOURCE_TYPE);
-        this.protocolConfiguration = protocolConfiguration;
+        this.resourceConfiguration = resourceConfiguration;
         init();
     }
 
-    public PressureSensorResource(String id, String type, ProtocolConfiguration protocolConfiguration) {
+    public PressureSensorResource(String id, String type, ResourceConfiguration resourceConfiguration) {
         super(id, type);
-        this.protocolConfiguration = protocolConfiguration;
+        this.resourceConfiguration = resourceConfiguration;
         init();
     }
 
@@ -73,7 +67,7 @@ public class PressureSensorResource extends DTObjectResource<PressureDescpritor>
 
     private void startPeriodicEventValueUpdateTask() {
         try{
-            logger.info("Starting periodic Update Task with Period {} ms", protocolConfiguration.getTelemetryUpdateTimeMs());
+            logger.info("Starting periodic Update Task with Period {} ms", resourceConfiguration.getTelemetryUpdateTimeMs());
 
             this.updateTimer = new Timer();
             this.updateTimer.schedule(new TimerTask() {
@@ -89,7 +83,7 @@ public class PressureSensorResource extends DTObjectResource<PressureDescpritor>
                         logger.info("End of the document");
                     }
                 }
-            }, protocolConfiguration.getStartUpDelayMs(), protocolConfiguration.getTelemetryUpdateTimeMs());
+            }, resourceConfiguration.getStartUpDelayMs(), resourceConfiguration.getTelemetryUpdateTimeMs());
         }catch (Exception e){
             logger.error("Error executing periodic resource value {}", e.getLocalizedMessage());
         }

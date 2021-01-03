@@ -1,8 +1,4 @@
 
-deviceNameSpace: com.iot.smartobject
-
-deviceID: 0001
-
 telemetryUpdateTimeMs: 1000
 
 totalTelemetryMessageLimit: 10000 #0 means no limit

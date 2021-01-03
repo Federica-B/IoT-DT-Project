@@ -1,12 +1,10 @@
 package sharedProtocolsClass.resource.sensors;
 
-import mqtt.configurationMqtt.MqttSmartObjectConfiguration;
 import mqtt.model.TemperatureDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sharedProtocolsClass.ProtocolConfiguration;
+import sharedProtocolsClass.ResourceConfiguration;
 import sharedProtocolsClass.resource.DTObjectResource;
-import sharedProtocolsClass.resource.ResourceDataListener;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -30,17 +28,17 @@ public class TemperatureSensorResource extends DTObjectResource<TemperatureDescr
 
     private TemperatureDescriptor updateTemperatureDescriptor = null;
 
-    private ProtocolConfiguration protocolConfiguration;
+    private ResourceConfiguration resourceConfiguration;
 
-    public TemperatureSensorResource(ProtocolConfiguration protocolConfiguration) {
+    public TemperatureSensorResource(ResourceConfiguration resourceConfiguration) {
         super(UUID.randomUUID().toString(), TemperatureSensorResource.RESOURCE_TYPE);
-        this.protocolConfiguration = protocolConfiguration;
+        this.resourceConfiguration = resourceConfiguration;
         init();
     }
 
-    public TemperatureSensorResource(String id, String type, ProtocolConfiguration protocolConfiguration) {
+    public TemperatureSensorResource(String id, String type, ResourceConfiguration resourceConfiguration) {
         super(id, type);
-        this.protocolConfiguration = protocolConfiguration;
+        this.resourceConfiguration = resourceConfiguration;
         init();
     }
 
@@ -69,7 +67,7 @@ public class TemperatureSensorResource extends DTObjectResource<TemperatureDescr
 
     private void startPeriodicEventValueUpdateTask() {
         try{
-            logger.info("Starting periodic Update Task with Period {} ms", protocolConfiguration.getTelemetryUpdateTimeMs());
+            logger.info("Starting periodic Update Task with Period {} ms", resourceConfiguration.getTelemetryUpdateTimeMs());
 
             this.updateTimer = new Timer();
             this.updateTimer.schedule(new TimerTask() {
@@ -85,7 +83,7 @@ public class TemperatureSensorResource extends DTObjectResource<TemperatureDescr
                         logger.info("End of the document");
                     }
                 }
-                }, protocolConfiguration.getStartUpDelayMs(), protocolConfiguration.getTelemetryUpdateTimeMs());
+                }, resourceConfiguration.getStartUpDelayMs(), resourceConfiguration.getTelemetryUpdateTimeMs());
         }catch (Exception e){
             logger.error("Error executing periodic resource value {}", e.getLocalizedMessage());
         }

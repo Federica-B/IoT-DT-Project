@@ -2,12 +2,12 @@ package mqtt.configurationMqtt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import sharedProtocolsClass.ProtocolConfiguration;
+import sharedProtocolsClass.ResourceConfiguration;
 
 import java.io.File;
 import java.util.UUID;
 
-public class MqttSmartObjectConfiguration extends ProtocolConfiguration {
+public class MqttSmartObjectConfiguration extends ResourceConfiguration {
     private String mqttBrokerAddress;
 
     private int mqttBrokerPort;
@@ -15,6 +15,10 @@ public class MqttSmartObjectConfiguration extends ProtocolConfiguration {
     private String mqttUser;
 
     private String mqttPw;
+
+    private String deviceNameSpace;
+
+    private String deviceID;
 
     private String basicTopic;
 
@@ -27,6 +31,9 @@ public class MqttSmartObjectConfiguration extends ProtocolConfiguration {
     private boolean cleanSession;
 
     private int connectionTimeout;
+
+
+
 
     public MqttSmartObjectConfiguration() {
         super();
@@ -62,6 +69,22 @@ public class MqttSmartObjectConfiguration extends ProtocolConfiguration {
 
     public void setMqttPw(String mqttPw) {
         this.mqttPw = mqttPw;
+    }
+
+    public String getDeviceNameSpace() {
+        return deviceNameSpace;
+    }
+
+    public void setDeviceNameSpace(String deviceNameSpace) {
+        this.deviceNameSpace = deviceNameSpace;
+    }
+
+    public String getDeviceID() {
+        return deviceID;
+    }
+
+    public void setDeviceID(String deviceID) {
+        this.deviceID = deviceID;
     }
 
     public String getBasicTopic() {
@@ -112,6 +135,8 @@ public class MqttSmartObjectConfiguration extends ProtocolConfiguration {
         this.connectionTimeout = connectionTimeout;
     }
 
+
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("MqttSmartObjectConfiguration{");
@@ -119,8 +144,8 @@ public class MqttSmartObjectConfiguration extends ProtocolConfiguration {
         sb.append(", mqttBrokerPort=").append(mqttBrokerPort);
         sb.append(", mqttUser=").append(mqttUser);
         sb.append(", mqttPw").append(mqttPw);
-        sb.append(", deviceNameSpace='").append(super.getDeviceNameSpace());
-        sb.append(", deviceID= ").append(super.getDeviceID());
+        sb.append(", deviceNameSpace='").append(deviceNameSpace);
+        sb.append(", deviceID= ").append(deviceID);
         sb.append(", basicTopic= ").append(basicTopic);
         sb.append(", telemetryTopic= ").append(telemetryTopic);
         sb.append(", telemetryUpdateTimeMs=").append(super.getTelemetryUpdateTimeMs());

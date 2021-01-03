@@ -21,11 +21,11 @@ public class SmartObjectCommunicationProcess {
     private static Logger logger = LoggerFactory.getLogger(SmartObjectCommunicationProcess.class);
     public static void main(String[] args) {
 
-        ProtocolConfiguration protocolConfiguration = readResourceFile();
+        ResourceConfiguration resourceConfiguration = readResourceFile();
         HashMap<String, DTObjectResource<?>> mapResource = new HashMap<>(){
             {
-                put("temperature", new  TemperatureSensorResource(protocolConfiguration));
-                put("pressure", new PressureSensorResource(protocolConfiguration));
+                put("temperature", new  TemperatureSensorResource(resourceConfiguration));
+                put("pressure", new PressureSensorResource(resourceConfiguration));
 
             }
         };
@@ -42,18 +42,18 @@ public class SmartObjectCommunicationProcess {
 
     }
 
-    private static ProtocolConfiguration readResourceFile() {
+    private static ResourceConfiguration readResourceFile() {
 
         try{
         File file = new File(RESOURCE_CONF_FILE);
 
         ObjectMapper om = new ObjectMapper(new YAMLFactory());
 
-        ProtocolConfiguration protocolConfiguration = om.readValue(file, ProtocolConfiguration.class);
+        ResourceConfiguration resourceConfiguration = om.readValue(file, ResourceConfiguration.class);
 
-        logger.info("Resource Configuration Loaded ! Conf: {}",protocolConfiguration);
+        logger.info("Resource Configuration Loaded ! Conf: {}", resourceConfiguration);
 
-        return protocolConfiguration;
+        return resourceConfiguration;
 
     }catch (Exception e){
         e.printStackTrace();

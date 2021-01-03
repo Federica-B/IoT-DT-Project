@@ -1,9 +1,7 @@
 package sharedProtocolsClass;
 
-public class ProtocolConfiguration {
-    private String deviceNameSpace;
+public class ResourceConfiguration {
 
-    private String deviceID;
 
     private int telemetryUpdateTimeMs;
 
@@ -11,24 +9,9 @@ public class ProtocolConfiguration {
 
     private int startUpDelayMs;
 
-    public ProtocolConfiguration() {
+    public ResourceConfiguration() {
     }
 
-    public String getDeviceNameSpace() {
-        return deviceNameSpace;
-    }
-
-    public void setDeviceNameSpace(String deviceNameSpace) {
-        this.deviceNameSpace = deviceNameSpace;
-    }
-
-    public String getDeviceID() {
-        return deviceID;
-    }
-
-    public void setDeviceID(String deviceID) {
-        this.deviceID = deviceID;
-    }
 
     public int getTelemetryUpdateTimeMs() {
         return telemetryUpdateTimeMs;
@@ -52,5 +35,15 @@ public class ProtocolConfiguration {
 
     public void setStartUpDelayMs(int startUpDelayMs) {
         this.startUpDelayMs = startUpDelayMs;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("ResourceConfiguration{");
+        sb.append("telemetryUpdateTimeMs=").append(telemetryUpdateTimeMs);
+        sb.append(", totalTelemetryMessageLimit=").append(totalTelemetryMessageLimit);
+        sb.append(", startUpDelayMs=").append(startUpDelayMs);
+        sb.append('}');
+        return sb.toString();
     }
 }
