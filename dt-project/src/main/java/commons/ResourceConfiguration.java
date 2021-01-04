@@ -1,4 +1,4 @@
-package sharedProtocolsClass;
+package commons;
 
 public class ResourceConfiguration {
 

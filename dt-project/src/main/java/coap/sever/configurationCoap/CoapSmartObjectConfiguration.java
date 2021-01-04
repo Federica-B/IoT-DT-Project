@@ -1,6 +1,6 @@
 package coap.sever.configurationCoap;
 
-import sharedProtocolsClass.ResourceConfiguration;
+import commons.ResourceConfiguration;
 
 public class CoapSmartObjectConfiguration extends ResourceConfiguration {
 

@@ -8,20 +8,16 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import mqtt.message.TelemetryMessage;
 import mqtt.model.PressureDescpritor;
-import mqtt.model.TemperatureDescriptor;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sharedProtocolsClass.resource.DTObjectResource;
-import sharedProtocolsClass.resource.ResourceDataListener;
-import sharedProtocolsClass.resource.sensors.PressureSensorResource;
-import sharedProtocolsClass.resource.sensors.TemperatureSensorResource;
+import commons.resource.DTObjectResource;
+import commons.resource.ResourceDataListener;
+import commons.resource.sensors.PressureSensorResource;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.*;
 
 

@@ -3,18 +3,12 @@ package coap.sever;
 import coap.resource.PressureResource;
 import coap.resource.TemperatureResource;
 import coap.sever.configurationCoap.CoapSmartObjectConfiguration;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import mqtt.configurationMqtt.MqttSmartObjectConfiguration;
-import mqtt.message.TelemetryMessage;
-import mqtt.model.TemperatureDescriptor;
 import org.eclipse.californium.core.CoapResource;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import sharedProtocolsClass.resource.DTObjectResource;
-import sharedProtocolsClass.resource.ResourceDataListener;
-import sharedProtocolsClass.resource.sensors.PressureSensorResource;
-import sharedProtocolsClass.resource.sensors.TemperatureSensorResource;
+import commons.resource.DTObjectResource;
+import commons.resource.sensors.PressureSensorResource;
+import commons.resource.sensors.TemperatureSensorResource;
 import org.eclipse.californium.core.CoapServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +40,7 @@ public class CoapServerProcess extends CoapServer {
 
     private CoapResource createTelemetryResources(){
 
-        CoapResource telemetryResource = new CoapResource("telemetry");
+        CoapResource sensorsResource = new CoapResource("sensors");
 
         TemperatureSensorResource temperatureSensorResource = new TemperatureSensorResource(coapSmartObjectConfiguration);
         PressureSensorResource pressureSensorResource = new PressureSensorResource(coapSmartObjectConfiguration);
@@ -57,31 +51,31 @@ public class CoapServerProcess extends CoapServer {
 
         logger.info("Defining and adding resources ...");
 
-        telemetryResource.add(temperatureResource);
-        telemetryResource.add(pressureResource);
+        sensorsResource.add(temperatureResource);
+        sensorsResource.add(pressureResource);
 
-        return telemetryResource;
+        return sensorsResource;
     }
 
     private CoapResource createTelemetryResources(Map<String, DTObjectResource<?>> resourceMap){
-        CoapResource telemetryResource = new CoapResource("telemetry");
+        CoapResource sensorsResource = new CoapResource("sensors");
         resourceMap.entrySet().forEach(resourceEntry ->{
 
             if(resourceEntry.getKey() != null && resourceEntry.getValue() != null){
                 DTObjectResource dtObjectResource = resourceEntry.getValue();
                 if(dtObjectResource.getType().equals(TemperatureSensorResource.RESOURCE_TYPE)){
                     TemperatureResource temperatureResource = new TemperatureResource(coapSmartObjectConfiguration, "temperature",(TemperatureSensorResource) dtObjectResource);
-                    telemetryResource.add(temperatureResource);
+                    sensorsResource.add(temperatureResource);
                 }
                 if(dtObjectResource.getType().equals(PressureSensorResource.RESOURCE_TYPE)){
                     PressureResource pressureResource = new PressureResource(coapSmartObjectConfiguration, "pressure", (PressureSensorResource) dtObjectResource);
-                    telemetryResource.add(pressureResource);
+                    sensorsResource.add(pressureResource);
                 }
             }
         });
         logger.info("Defining and adding resources ...");
 
-        return telemetryResource;
+        return sensorsResource;
 
     }
 

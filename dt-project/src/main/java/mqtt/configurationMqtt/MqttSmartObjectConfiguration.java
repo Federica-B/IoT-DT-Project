@@ -2,7 +2,7 @@ package mqtt.configurationMqtt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import sharedProtocolsClass.ResourceConfiguration;
+import commons.ResourceConfiguration;
 
 import java.io.File;
 import java.util.UUID;

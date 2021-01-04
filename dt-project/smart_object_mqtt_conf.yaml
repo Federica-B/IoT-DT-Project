@@ -12,7 +12,7 @@ deviceNameSpace: com.iot.smartobject
 
 deviceID: 0001
 
-basicTopic: iot/smartObject
+basicTopic: iot/smartobject
 
 telemetryTopic: telemetry
 
