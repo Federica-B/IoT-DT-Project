@@ -10,7 +10,7 @@ public class CoapObsProcess {
 
     public static void main(String[] args) {
 
-        String targetCoapResourceURL = "coap://10.0.0.175:5683/temperature";
+        String targetCoapResourceURL = "coap://10.0.0.175:5683/telemetry/temperature";
 
         CoapClient client = new CoapClient(targetCoapResourceURL);
 

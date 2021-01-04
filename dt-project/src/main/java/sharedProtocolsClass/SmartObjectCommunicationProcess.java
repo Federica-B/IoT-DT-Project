@@ -34,7 +34,12 @@ public class SmartObjectCommunicationProcess {
         coapServerProcess.start();
 
         coapServerProcess.getRoot().getChildren().stream().forEach(resource -> {
-            logger.info("Resource {} URI: {} (Observable: {})", resource.getName(), resource.getURI(), resource.isObservable());
+            logger.info("Resource {} -> URI: {} (Observable: {})", resource.getName(), resource.getURI(), resource.isObservable());
+            if(!resource.getURI().equals("/.well-known")){
+                resource.getChildren().stream().forEach(childResource -> {
+                    logger.info("\t Resource {} -> URI: {} (Observable: {})", childResource.getName(), childResource.getURI(), childResource.isObservable());
+                });
+            }
         });
 
         MqttSmartObjectProcess mqttSmartObjectProcess = new MqttSmartObjectProcess(mapResource);

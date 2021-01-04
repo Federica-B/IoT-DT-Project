@@ -16,7 +16,7 @@ import java.io.IOException;
 public class CoapGetJsonProcess {
     private final static Logger logger = LoggerFactory.getLogger(CoapGetJsonProcess.class);
 
-    private static final String COAP_ENDPOINT = "coap://10.0.0.175:5683/temperature";
+    private static final String COAP_ENDPOINT = "coap://10.0.0.175:5683/telemetry/pressure";
 
     public static void main(String[] args) {
 

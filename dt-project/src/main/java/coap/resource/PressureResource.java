@@ -6,6 +6,7 @@ import coap.utils.SenMLPack;
 import coap.utils.SenMLRecord;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import mqtt.message.TelemetryMessage;
 import mqtt.model.PressureDescpritor;
 import mqtt.model.TemperatureDescriptor;
 import org.eclipse.californium.core.CoapResource;
@@ -116,22 +117,38 @@ public class PressureResource extends CoapResource {
     public void handleGET(CoapExchange exchange) {
         exchange.setMaxAge(coapSmartObjectConfiguration.getResourceMaxAgeSecond());
 
-        //two type of response: JSON + SenML and plain
-        //code senml-json  110 - json 50 - plain 0
-        if(exchange.getRequestOptions().getAccept() == MediaTypeRegistry.APPLICATION_SENML_JSON ||
-                exchange.getRequestOptions().getAccept() == MediaTypeRegistry.APPLICATION_JSON){
-            Optional<String> senmlPayload = getJsonSenmlResponse();
+        if(exchange.getRequestOptions().getAccept() == MediaTypeRegistry.APPLICATION_JSON){
+            try {
+                TelemetryMessage<?> telemetryMessage = new TelemetryMessage(
+                        RESOURCE_TYPE, pressure, PressureDescpritor.FILE_TEMPERATURE_PROVIDER);
+                if (telemetryMessage != null) {
 
-            if(senmlPayload.isPresent())
-                exchange.respond(CoAP.ResponseCode.CONTENT, senmlPayload.get(), exchange.getRequestOptions().getAccept());
-            else
-                exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR);
+                    Optional<String> jsonResponse = Optional.ofNullable(objectMapper.writeValueAsString(telemetryMessage));
+
+                    if (jsonResponse.isPresent())
+                        exchange.respond(CoAP.ResponseCode.CONTENT, jsonResponse.get(), exchange.getRequestOptions().getAccept());
+                }
+                else{ exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR);}
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
         }else{
-            if(pressure != null)
-                exchange.respond(CoAP.ResponseCode.CONTENT, String.valueOf(pressure),MediaTypeRegistry.TEXT_PLAIN);
+
+            Optional<String> textPlainResponse = getTextPlainResponse();
+
+            if(textPlainResponse.isPresent())
+                exchange.respond(CoAP.ResponseCode.CONTENT, textPlainResponse.get(), exchange.getRequestOptions().getAccept());
             else
                 exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR);
 
         }
+    }
+
+    private Optional<String> getTextPlainResponse() {
+        final StringBuffer sb = new StringBuffer("{");
+        sb.append(System.currentTimeMillis()).append(", ");
+        sb.append(pressure.toString()).append("}");
+        return Optional.of(sb.toString());
     }
 }

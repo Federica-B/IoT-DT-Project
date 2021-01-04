@@ -9,6 +9,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import mqtt.configurationMqtt.MqttSmartObjectConfiguration;
 import mqtt.message.TelemetryMessage;
 import mqtt.model.TemperatureDescriptor;
+import org.eclipse.californium.core.CoapResource;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import sharedProtocolsClass.resource.DTObjectResource;
 import sharedProtocolsClass.resource.ResourceDataListener;
@@ -38,6 +39,15 @@ public class CoapServerProcess extends CoapServer {
 
         String deviceId = String.format("dt:%s",coapSmartObjectConfiguration.getDeviceID());
 
+        this.add(createTelemetryResources());
+
+
+    }
+
+    private CoapResource createTelemetryResources(){
+
+        CoapResource telemetryResource = new CoapResource("telemetry");
+
         TemperatureSensorResource temperatureSensorResource = new TemperatureSensorResource(coapSmartObjectConfiguration);
         PressureSensorResource pressureSensorResource = new PressureSensorResource(coapSmartObjectConfiguration);
 
@@ -47,8 +57,31 @@ public class CoapServerProcess extends CoapServer {
 
         logger.info("Defining and adding resources ...");
 
-        this.add(temperatureResource);
-        this.add(pressureResource);
+        telemetryResource.add(temperatureResource);
+        telemetryResource.add(pressureResource);
+
+        return telemetryResource;
+    }
+
+    private CoapResource createTelemetryResources(Map<String, DTObjectResource<?>> resourceMap){
+        CoapResource telemetryResource = new CoapResource("telemetry");
+        resourceMap.entrySet().forEach(resourceEntry ->{
+
+            if(resourceEntry.getKey() != null && resourceEntry.getValue() != null){
+                DTObjectResource dtObjectResource = resourceEntry.getValue();
+                if(dtObjectResource.getType().equals(TemperatureSensorResource.RESOURCE_TYPE)){
+                    TemperatureResource temperatureResource = new TemperatureResource(coapSmartObjectConfiguration, "temperature",(TemperatureSensorResource) dtObjectResource);
+                    telemetryResource.add(temperatureResource);
+                }
+                if(dtObjectResource.getType().equals(PressureSensorResource.RESOURCE_TYPE)){
+                    PressureResource pressureResource = new PressureResource(coapSmartObjectConfiguration, "pressure", (PressureSensorResource) dtObjectResource);
+                    telemetryResource.add(pressureResource);
+                }
+            }
+        });
+        logger.info("Defining and adding resources ...");
+
+        return telemetryResource;
 
     }
 
@@ -61,20 +94,7 @@ public class CoapServerProcess extends CoapServer {
 
         logger.info("Defining and adding resources ...");
 
-        resourceMap.entrySet().forEach(resourceEntry ->{
-
-            if(resourceEntry.getKey() != null && resourceEntry.getValue() != null){
-                DTObjectResource dtObjectResource = resourceEntry.getValue();
-                if(dtObjectResource.getType().equals(TemperatureSensorResource.RESOURCE_TYPE)){
-                    TemperatureResource temperatureResource = new TemperatureResource(coapSmartObjectConfiguration, "temperature",(TemperatureSensorResource) dtObjectResource);
-                    this.add(temperatureResource);
-                }
-                if(dtObjectResource.getType().equals(PressureSensorResource.RESOURCE_TYPE)){
-                    PressureResource pressureResource = new PressureResource(coapSmartObjectConfiguration, "pressure", (PressureSensorResource) dtObjectResource);
-                    this.add(pressureResource);
-                }
-        }
-    });
+        this.add(createTelemetryResources(resourceMap));
     }
 
 
@@ -117,7 +137,12 @@ public class CoapServerProcess extends CoapServer {
 
 
         coapServerProcess.getRoot().getChildren().stream().forEach(resource -> {
-            logger.info("Resource {} URI: {} (Observable: {})", resource.getName(), resource.getURI(), resource.isObservable());
+            logger.info("Resource {} -> URI: {} (Observable: {})", resource.getName(), resource.getURI(), resource.isObservable());
+            if(!resource.getURI().equals("/.well-known")){
+                resource.getChildren().stream().forEach(childResource -> {
+                    logger.info("\t Resource {} -> URI: {} (Observable: {})", childResource.getName(), childResource.getURI(), childResource.isObservable());
+                });
+            }
         });
     }
 }
