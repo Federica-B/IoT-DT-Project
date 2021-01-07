@@ -17,7 +17,7 @@ public class CoapGetProcess {
     private final static Logger logger = LoggerFactory.getLogger(CoapGetProcess.class);
 
     //.well-known/core
-    private static final String COAP_ENDPOINT = "coap://10.0.0.175:5683/telemetry/pressure";
+    private static final String COAP_ENDPOINT = "coap://10.0.0.175:5683/.well-known/core";
 
     public static void main(String[] args) {
 

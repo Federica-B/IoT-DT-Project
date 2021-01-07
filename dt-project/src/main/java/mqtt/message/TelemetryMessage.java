@@ -6,13 +6,13 @@ public class TelemetryMessage<T>{
     @JsonProperty("timestamp")
     private long timestamp;
 
-    @JsonProperty("type")
+    @JsonProperty("device_type")
     private String type;
 
     @JsonProperty("provider")
     private String file_provider;
 
-    @JsonProperty("data")
+    @JsonProperty("value")
     private T dataValue;
 
 
@@ -65,9 +65,9 @@ public class TelemetryMessage<T>{
     public String toString() {
         final StringBuffer sb = new StringBuffer("TelemetryMessage{");
         sb.append("timestamp = ").append(timestamp);
-        sb.append(", type = ").append(type);
-        sb.append(", dataValue = ").append(dataValue);
-        sb.append(", file_provider = ").append(file_provider);
+        sb.append(", device_type = ").append(type);
+        sb.append(", value = ").append(dataValue);
+        sb.append(", provider = ").append(file_provider);
         sb.append('}');
         return sb.toString();
     }

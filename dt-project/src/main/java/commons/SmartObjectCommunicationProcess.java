@@ -6,9 +6,9 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import mqtt.process.MqttSmartObjectProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import commons.resource.DTObjectResource;
-import commons.resource.sensors.PressureSensorResource;
-import commons.resource.sensors.TemperatureSensorResource;
+import commons.resources.DTObjectResource;
+import commons.resources.sensors.PressureSensorResource;
+import commons.resources.sensors.TemperatureSensorResource;
 
 import java.io.File;
 import java.util.HashMap;

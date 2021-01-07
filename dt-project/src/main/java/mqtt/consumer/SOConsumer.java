@@ -58,15 +58,15 @@ public class SOConsumer {
                 MessageDescriptor msgDescriptor = parseJsonMessage(payload);
 
                 //Check and print the received Message
-                if(msgDescriptor != null)
+                if(msgDescriptor != null){
                     logger.info("JSON MessageDescriptor Received ({}) Data -> Timestamp: {}, Type: {}, Value: {}, Provider: {}",
                             topic,
                             msgDescriptor.getTimestmp(),
                             msgDescriptor.getType(),
                             msgDescriptor.getData(),
-                            msgDescriptor.getProvider());
-                else
-                    logger.info("Message Received ({}) Message Received: {}", topic, new String(payload));
+                            msgDescriptor.getProvider());}
+                else{
+                    logger.info("Message Received ({}) Message Received: {}", topic, new String(payload));}
             });
 
         }catch (Exception e){

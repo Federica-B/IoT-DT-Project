@@ -14,9 +14,9 @@ import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import commons.resource.DTObjectResource;
-import commons.resource.ResourceDataListener;
-import commons.resource.sensors.PressureSensorResource;
+import commons.resources.DTObjectResource;
+import commons.resources.ResourceDataListener;
+import commons.resources.sensors.PressureSensorResource;
 
 import java.util.*;
 

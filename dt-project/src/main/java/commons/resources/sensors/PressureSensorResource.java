@@ -1,10 +1,10 @@
-package commons.resource.sensors;
+package commons.resources.sensors;
 
 import mqtt.model.PressureDescpritor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import commons.ResourceConfiguration;
-import commons.resource.DTObjectResource;
+import commons.resources.DTObjectResource;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

@@ -14,7 +14,7 @@ deviceID: 0001
 
 basicTopic: iot/smartobject
 
-telemetryTopic: telemetry
+telemetryTopic: sensors
 
 telemetryUpdateTimeMs: 1000
 
